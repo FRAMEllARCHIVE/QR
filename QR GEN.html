@@ -1,0 +1,107 @@
+<html><head><base href="https://qrcodegen.io"/><title>QR Code Generator - Quick URL to QR</title><style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    h1 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    input[type="url"] {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #qrcode {
+        margin-top: 2rem;
+    }
+    .error {
+        color: red;
+        margin-top: 1rem;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+</head><body>
+<div class="container">
+    <h1>QR Code Generator</h1>
+    <form id="qr-form" method="GET" action="https://qrcodegen.io/generate">
+        <input type="url" id="url-input" name="url" placeholder="Enter URL here" required>
+        <button type="submit">Generate QR Code</button>
+    </form>
+    <div id="qrcode"></div>
+    <p id="error" class="error"></p>
+</div>
+<script>
+    const form = document.getElementById('qr-form');
+    const urlInput = document.getElementById('url-input');
+    const qrcodeContainer = document.getElementById('qrcode');
+    const errorElement = document.getElementById('error');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        generateQR();
+    });
+
+    function generateQR() {
+        const url = urlInput.value.trim();
+        
+        if (!isValidURL(url)) {
+            errorElement.textContent = "Please enter a valid URL";
+            qrcodeContainer.innerHTML = '';
+            return;
+        }
+
+        errorElement.textContent = '';
+        
+        const qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+
+        qrcodeContainer.innerHTML = qr.createImgTag(5);
+    }
+
+    function isValidURL(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    // Check if there's a URL in the query params and generate QR code if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialURL = urlParams.get('url');
+    if (initialURL) {
+        urlInput.value = initialURL;
+        generateQR();
+    }
+</script>
+</body></html>
